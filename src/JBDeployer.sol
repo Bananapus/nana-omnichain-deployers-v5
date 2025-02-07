@@ -18,31 +18,36 @@ import {JBPermissionIds} from "@bananapus/permission-ids/src/JBPermissionIds.sol
 
 /// @notice `JBDeployer` deploys, manages, and operates Juicebox projects with suckers.
 contract JBDeployer is JBPermissioned {
+
+    //*********************************************************************//
+    // --------------------------- custom errors ------------------------- //
+    //*********************************************************************//
+
     error JBDeployer_RulesetDoesNotAllowDeployingSuckers();
 
     //*********************************************************************//
     // --------------- public immutable stored properties ---------------- //
     //*********************************************************************//
 
-    /// @notice The controller used to create and manage Juicebox projects for revnets.
+    /// @notice The controller used to create and manage Juicebox projects.
     IJBController public immutable CONTROLLER;
 
     /// @notice Mints ERC-721s that represent Juicebox project ownership and transfers.
     IJBProjects public immutable PROJECTS;
 
-    /// @notice Deploys tiered ERC-721 hooks for revnets.
+    /// @notice Deploys tiered ERC-721 hooks for projects.
     IJB721TiersHookProjectDeployer public immutable HOOK_PROJECT_DEPLOYER;
 
-    /// @notice Deploys and tracks suckers for revnets.
+    /// @notice Deploys and tracks suckers for projects.
     IJBSuckerRegistry public immutable SUCKER_REGISTRY;
 
     //*********************************************************************//
     // -------------------------- constructor ---------------------------- //
     //*********************************************************************//
 
-    /// @param controller The controller to use for launching and operating the Juicebox projects which will be revnets.
-    /// @param suckerRegistry The registry to use for deploying and tracking each revnet's suckers.
-    /// @param hookProjectDeployer The deployer to use for revnet's tiered ERC-721 hooks.
+    /// @param controller The controller to use for launching and operating the Juicebox projects.
+    /// @param suckerRegistry The registry to use for deploying and tracking each project's suckers.
+    /// @param hookProjectDeployer The deployer to use for project's tiered ERC-721 hooks.
     constructor(
         IJBController controller,
         IJBSuckerRegistry suckerRegistry,
@@ -108,8 +113,8 @@ contract JBDeployer is JBPermissioned {
     /// @param rulesetConfigurations The rulesets to queue.
     /// @param terminalConfigurations The terminals to set up for the project.
     /// @param memo A memo to pass along to the emitted event.
-    /// @param suckerDeploymentConfiguration The suckers to set up for the revnet. Suckers facilitate cross-chain
-    /// token transfers between peer revnets on different networks.
+    /// @param suckerDeploymentConfiguration The suckers to set up for the project. Suckers facilitate cross-chain
+    /// token transfers between peer projects on different networks.
     /// @return projectId The project's ID.
     function launchProjectFor(
         address owner,
