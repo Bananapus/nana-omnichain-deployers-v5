@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IJBController} from "@bananapus/core/src/interfaces/IJBController.sol";
 import {IJBProjects} from "@bananapus/core/src/interfaces/IJBProjects.sol";
 import {IJB721TiersHookProjectDeployer} from "@bananapus/721-hook/src/interfaces/IJB721TiersHookProjectDeployer.sol";
@@ -18,7 +19,6 @@ import {JBPermissionIds} from "@bananapus/permission-ids/src/JBPermissionIds.sol
 
 /// @notice `JBDeployer` deploys, manages, and operates Juicebox projects with suckers.
 contract JBDeployer is JBPermissioned {
-
     //*********************************************************************//
     // --------------------------- custom errors ------------------------- //
     //*********************************************************************//
@@ -129,7 +129,7 @@ contract JBDeployer is JBPermissioned {
     {
         // Launch the project.
         projectId = CONTROLLER.launchProjectFor({
-            owner: owner,
+            owner: address(this),
             projectUri: projectUri,
             rulesetConfigurations: rulesetConfigurations,
             terminalConfigurations: terminalConfigurations,
@@ -146,6 +146,9 @@ contract JBDeployer is JBPermissioned {
                 configurations: suckerDeploymentConfiguration.deployerConfigurations
             });
         }
+
+        // Transfer the project to the owner.
+        IERC721(PROJECTS).transferFrom({from: address(this), to: owner, tokenId: projectId});
     }
 
     /// @notice Launches a new project with a 721 tiers hook attached, and with suckers.
@@ -169,7 +172,7 @@ contract JBDeployer is JBPermissioned {
     {
         // Launch the project.
         (projectId, hook) = HOOK_PROJECT_DEPLOYER.launchProjectFor({
-            owner: owner,
+            owner: address(this),
             deployTiersHookConfig: deployTiersHookConfig,
             launchProjectConfig: launchProjectConfig,
             controller: CONTROLLER,
@@ -186,5 +189,8 @@ contract JBDeployer is JBPermissioned {
                 configurations: suckerDeploymentConfiguration.deployerConfigurations
             });
         }
+
+        // Transfer the project to the owner.
+        IERC721(PROJECTS).transferFrom({from: address(this), to: owner, tokenId: projectId});
     }
 }

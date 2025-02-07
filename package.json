@@ -17,7 +17,8 @@
         "@bananapus/core": "^0.0.45",
         "@bananapus/suckers": "^0.0.32",
         "@bananapus/permission-ids": "^0.0.17",
-        "@rev-net/core": "^0.0.45"
+        "@rev-net/core": "^0.0.45",
+        "@openzeppelin/contracts": "^5.2.0"
     },
     "devDependencies": {
         "@sphinx-labs/plugins": "^0.33.1"
