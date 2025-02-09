@@ -1,23 +1,25 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
+import {ERC2771Context} from "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {IJBController} from "@bananapus/core/src/interfaces/IJBController.sol";
-import {IJBProjects} from "@bananapus/core/src/interfaces/IJBProjects.sol";
-import {IJB721TiersHookProjectDeployer} from "@bananapus/721-hook/src/interfaces/IJB721TiersHookProjectDeployer.sol";
+import {Context} from "@openzeppelin/contracts/utils/Context.sol";
 import {IJB721TiersHook} from "@bananapus/721-hook/src/interfaces/IJB721TiersHook.sol";
-import {IJBSuckerRegistry} from "@bananapus/suckers/src/interfaces/IJBSuckerRegistry.sol";
-import {JBPermissioned} from "@bananapus/core/src/abstract/JBPermissioned.sol";
-import {IJBPermissioned} from "@bananapus/core/src/interfaces/IJBPermissioned.sol";
+import {IJB721TiersHookProjectDeployer} from "@bananapus/721-hook/src/interfaces/IJB721TiersHookProjectDeployer.sol";
 import {JBDeploy721TiersHookConfig} from "@bananapus/721-hook/src/structs/JBDeploy721TiersHookConfig.sol";
 import {JBLaunchProjectConfig} from "@bananapus/721-hook/src/structs/JBLaunchProjectConfig.sol";
+import {JBPermissioned} from "@bananapus/core/src/abstract/JBPermissioned.sol";
+import {IJBController} from "@bananapus/core/src/interfaces/IJBController.sol";
+import {IJBPermissioned} from "@bananapus/core/src/interfaces/IJBPermissioned.sol";
+import {IJBProjects} from "@bananapus/core/src/interfaces/IJBProjects.sol";
 import {JBRulesetConfig} from "@bananapus/core/src/structs/JBRulesetConfig.sol";
 import {JBTerminalConfig} from "@bananapus/core/src/structs/JBTerminalConfig.sol";
-import {REVSuckerDeploymentConfig} from "@rev-net/core/src/structs/REVSuckerDeploymentConfig.sol";
+import {IJBSuckerRegistry} from "@bananapus/suckers/src/interfaces/IJBSuckerRegistry.sol";
 import {JBPermissionIds} from "@bananapus/permission-ids/src/JBPermissionIds.sol";
+import {REVSuckerDeploymentConfig} from "@rev-net/core/src/structs/REVSuckerDeploymentConfig.sol";
 
 /// @notice `JBDeployer` deploys, manages, and operates Juicebox projects with suckers.
-contract JBDeployer is JBPermissioned {
+contract JBDeployer is ERC2771Context, JBPermissioned {
 
     //*********************************************************************//
     // --------------- public immutable stored properties ---------------- //
@@ -42,12 +44,15 @@ contract JBDeployer is JBPermissioned {
     /// @param controller The controller to use for launching and operating the Juicebox projects.
     /// @param suckerRegistry The registry to use for deploying and tracking each project's suckers.
     /// @param hookProjectDeployer The deployer to use for project's tiered ERC-721 hooks.
+    /// @param trustedForwarder The trusted forwarder for the ERC2771Context.
     constructor(
         IJBController controller,
         IJBSuckerRegistry suckerRegistry,
-        IJB721TiersHookProjectDeployer hookProjectDeployer
+        IJB721TiersHookProjectDeployer hookProjectDeployer,
+        address trustedForwarder
     )
         JBPermissioned(IJBPermissioned(address(controller)).PERMISSIONS())
+        ERC2771Context(trustedForwarder)
     {
         CONTROLLER = controller;
         PROJECTS = controller.PROJECTS();
@@ -159,7 +164,7 @@ contract JBDeployer is JBPermissioned {
             deployTiersHookConfig: deployTiersHookConfig,
             launchProjectConfig: launchProjectConfig,
             controller: CONTROLLER,
-            salt: salt
+            salt: keccak256(abi.encode(_msgSender(), salt))
         });
 
         // Deploy the suckers (if applicable).
@@ -175,5 +180,26 @@ contract JBDeployer is JBPermissioned {
 
         // Transfer the project to the owner.
         IERC721(PROJECTS).transferFrom({from: address(this), to: owner, tokenId: projectId});
+    }
+
+    //*********************************************************************//
+    // ------------------------ internal functions ----------------------- //
+    //*********************************************************************//
+
+    /// @notice The calldata. Preferred to use over `msg.data`.
+    /// @return calldata The `msg.data` of this call.
+    function _msgData() internal view override(ERC2771Context, Context) returns (bytes calldata) {
+        return ERC2771Context._msgData();
+    }
+
+    /// @notice The message's sender. Preferred to use over `msg.sender`.
+    /// @return sender The address which sent this call.
+    function _msgSender() internal view override(ERC2771Context, Context) returns (address sender) {
+        return ERC2771Context._msgSender();
+    }
+
+    /// @dev ERC-2771 specifies the context as being a single address (20 bytes).
+    function _contextSuffixLength() internal view virtual override(ERC2771Context, Context) returns (uint256) {
+        return ERC2771Context._contextSuffixLength();
     }
 }
