@@ -12,18 +12,12 @@ import {IJBPermissioned} from "@bananapus/core/src/interfaces/IJBPermissioned.so
 import {JBDeploy721TiersHookConfig} from "@bananapus/721-hook/src/structs/JBDeploy721TiersHookConfig.sol";
 import {JBLaunchProjectConfig} from "@bananapus/721-hook/src/structs/JBLaunchProjectConfig.sol";
 import {JBRulesetConfig} from "@bananapus/core/src/structs/JBRulesetConfig.sol";
-import {JBRulesetMetadata} from "@bananapus/core/src/structs/JBRulesetMetadata.sol";
 import {JBTerminalConfig} from "@bananapus/core/src/structs/JBTerminalConfig.sol";
 import {REVSuckerDeploymentConfig} from "@rev-net/core/src/structs/REVSuckerDeploymentConfig.sol";
 import {JBPermissionIds} from "@bananapus/permission-ids/src/JBPermissionIds.sol";
 
 /// @notice `JBDeployer` deploys, manages, and operates Juicebox projects with suckers.
 contract JBDeployer is JBPermissioned {
-    //*********************************************************************//
-    // --------------------------- custom errors ------------------------- //
-    //*********************************************************************//
-
-    error JBDeployer_RulesetDoesNotAllowDeployingSuckers();
 
     //*********************************************************************//
     // --------------- public immutable stored properties ---------------- //
@@ -82,17 +76,6 @@ contract JBDeployer is JBPermissioned {
             projectId: projectId,
             permissionId: JBPermissionIds.DEPLOY_SUCKERS
         });
-
-        // Check if the current ruleset allows deploying new suckers.
-        // slither-disable-next-line unused-return
-        (, JBRulesetMetadata memory metadata) = CONTROLLER.currentRulesetOf(projectId);
-
-        // Check the third bit, it indicates if the ruleset allows new suckers to be deployed.
-        bool allowsDeployingSuckers = ((metadata.metadata >> 2) & 1) == 1;
-
-        if (!allowsDeployingSuckers) {
-            revert JBDeployer_RulesetDoesNotAllowDeployingSuckers();
-        }
 
         // Deploy the suckers.
         // slither-disable-next-line unused-return
