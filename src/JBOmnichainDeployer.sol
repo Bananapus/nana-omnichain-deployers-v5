@@ -19,7 +19,7 @@ import {JBPermissionIds} from "@bananapus/permission-ids/src/JBPermissionIds.sol
 import {REVSuckerDeploymentConfig} from "@rev-net/core/src/structs/REVSuckerDeploymentConfig.sol";
 
 /// @notice `JBDeployer` deploys, manages, and operates Juicebox projects with suckers.
-contract JBDeployer is ERC2771Context, JBPermissioned {
+contract JBOmnichainDeployer is ERC2771Context, JBPermissioned {
 
     //*********************************************************************//
     // --------------- public immutable stored properties ---------------- //

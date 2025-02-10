@@ -8,10 +8,10 @@ import "@bananapus/core/script/helpers/CoreDeploymentLib.sol";
 import "@bananapus/suckers/script/helpers/SuckerDeploymentLib.sol";
 import "@bananapus/721-hook/script/helpers/Hook721DeploymentLib.sol";
 
-import "src/JBDeployer.sol";
+import "src/JBOmnichainDeployer.sol";
 
 contract Deploy is Script, Sphinx {
-    bytes32 constant NANA_DEPLOYER_SALT = "JBDeployer";
+    bytes32 constant NANA_OMNICHAIN_DEPLOYER_SALT = "JBOmnichainDeployer";
 
     /// @notice tracks the deployment of the core contracts for the chain we are deploying to.
     CoreDeployment core;
@@ -24,7 +24,7 @@ contract Deploy is Script, Sphinx {
 
     function configureSphinx() public override {
         // TODO: Update to contain JB Emergency Developers
-        sphinxConfig.projectName = "nana-deployers";
+        sphinxConfig.projectName = "nana-omnichain-deployers";
         sphinxConfig.mainnets = ["ethereum", "optimism", "base", "arbitrum"];
         sphinxConfig.testnets = ["ethereum_sepolia", "optimism_sepolia", "base_sepolia", "arbitrum_sepolia"];
     }
@@ -52,12 +52,12 @@ contract Deploy is Script, Sphinx {
         // Only deploy if this bytecode is not already deployed.
         if (
             !_isDeployed(
-                NANA_DEPLOYER_SALT,
-                type(JBDeployer).creationCode,
+                NANA_OMNICHAIN_DEPLOYER_SALT,
+                type(JBOmnichainDeployer).creationCode,
                 abi.encode(core.controller, suckers.registry, hook.project_deployer, core.trustedForwarder)
             )
         ) {
-            new JBDeployer{salt: NANA_DEPLOYER_SALT}(
+            new JBOmnichainDeployer{salt: NANA_OMNICHAIN_DEPLOYER_SALT}(
                 core.controller, suckers.registry, hook.project_deployer, core.trustedForwarder
             );
         }

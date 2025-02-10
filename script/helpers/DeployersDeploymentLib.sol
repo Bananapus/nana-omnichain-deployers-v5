@@ -5,10 +5,10 @@ import {stdJson} from "forge-std/Script.sol";
 import {Vm} from "forge-std/Vm.sol";
 import {SphinxConstants, NetworkInfo} from "@sphinx-labs/contracts/SphinxConstants.sol";
 
-import {JBDeployer} from "src/JBDeployer.sol";
+import {JBOmnichainDeployer} from "src/JBOmnichainDeployer.sol";
 
 struct DeployersDeployment {
-    JBDeployer deployer;
+    JBOmnichainDeployer deployer;
 }
 
 library SuckerDeploymentLib {
@@ -43,7 +43,7 @@ library SuckerDeploymentLib {
         returns (DeployersDeployment memory deployment)
     {
         // Is deployed on all (supported) chains.
-        deployment.deployer = JBDeployer(_getDeploymentAddress(path, "nana-deployers", network_name, "JBDeployer"));
+        deployment.deployer = JBOmnichainDeployer(_getDeploymentAddress(path, "nana-omnichain-deployers", network_name, "JBOmnichainDeployer"));
     }
 
     /// @notice Get the address of a contract that was deployed by the Deploy script.
