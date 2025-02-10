@@ -10,11 +10,11 @@
         "test": "forge test",
         "deploy:mainnets": "source ./.env && export START_TIME=$(date +%s) && npx sphinx propose ./script/Deploy.s.sol --networks mainnets",
         "deploy:testnets": "source ./.env && export START_TIME=$(date +%s) && npx sphinx propose ./script/Deploy.s.sol --networks testnets",
-        "artifacts": "source ./.env && npx sphinx artifacts --org-id 'ea165b21-7cdc-4d7b-be59-ecdd4c26bee4' --project-name 'revnet-core-testnet'"
+        "artifacts": "source ./.env && npx sphinx artifacts --org-id 'ea165b21-7cdc-4d7b-be59-ecdd4c26bee4' --project-name 'nana-deployers-testnet'"
     },
     "dependencies": {
         "@bananapus/721-hook": "^0.0.32",
-        "@bananapus/core": "^0.0.45",
+        "@bananapus/core": "^0.0.46",
         "@bananapus/suckers": "^0.0.32",
         "@bananapus/permission-ids": "^0.0.17",
         "@rev-net/core": "^0.0.45",
