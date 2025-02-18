@@ -43,7 +43,9 @@ library SuckerDeploymentLib {
         returns (DeployersDeployment memory deployment)
     {
         // Is deployed on all (supported) chains.
-        deployment.deployer = JBOmnichainDeployer(_getDeploymentAddress(path, "nana-omnichain-deployers", network_name, "JBOmnichainDeployer"));
+        deployment.deployer = JBOmnichainDeployer(
+            _getDeploymentAddress(path, "nana-omnichain-deployers", network_name, "JBOmnichainDeployer")
+        );
     }
 
     /// @notice Get the address of a contract that was deployed by the Deploy script.
