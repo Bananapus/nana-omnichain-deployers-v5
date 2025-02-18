@@ -20,7 +20,6 @@ import {REVSuckerDeploymentConfig} from "@rev-net/core/src/structs/REVSuckerDepl
 
 /// @notice `JBDeployer` deploys, manages, and operates Juicebox projects with suckers.
 contract JBOmnichainDeployer is ERC2771Context, JBPermissioned {
-
     //*********************************************************************//
     // --------------- public immutable stored properties ---------------- //
     //*********************************************************************//
