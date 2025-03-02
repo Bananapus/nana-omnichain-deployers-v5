@@ -3,6 +3,7 @@ pragma solidity 0.8.23;
 
 import {ERC2771Context} from "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {Context} from "@openzeppelin/contracts/utils/Context.sol";
 import {IJB721TiersHook} from "@bananapus/721-hook/src/interfaces/IJB721TiersHook.sol";
 import {IJB721TiersHookProjectDeployer} from "@bananapus/721-hook/src/interfaces/IJB721TiersHookProjectDeployer.sol";
@@ -19,7 +20,7 @@ import {JBPermissionIds} from "@bananapus/permission-ids/src/JBPermissionIds.sol
 import {REVSuckerDeploymentConfig} from "@rev-net/core/src/structs/REVSuckerDeploymentConfig.sol";
 
 /// @notice `JBDeployer` deploys, manages, and operates Juicebox projects with suckers.
-contract JBOmnichainDeployer is ERC2771Context, JBPermissioned {
+contract JBOmnichainDeployer is ERC2771Context, JBPermissioned, IERC721Receiver {
     //*********************************************************************//
     // --------------- public immutable stored properties ---------------- //
     //*********************************************************************//
@@ -179,6 +180,14 @@ contract JBOmnichainDeployer is ERC2771Context, JBPermissioned {
 
         // Transfer the project to the owner.
         IERC721(PROJECTS).transferFrom({from: address(this), to: owner, tokenId: projectId});
+    }
+
+    /// @dev Make sure this contract can only receive project NFTs from `JBProjects`.
+    function onERC721Received(address, address, uint256, bytes calldata) external view returns (bytes4) {
+        // Make sure the 721 received is from the `JBProjects` contract.
+        if (msg.sender != address(PROJECTS)) revert();
+
+        return IERC721Receiver.onERC721Received.selector;
     }
 
     //*********************************************************************//
