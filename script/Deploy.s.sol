@@ -24,7 +24,7 @@ contract Deploy is Script, Sphinx {
 
     function configureSphinx() public override {
         // TODO: Update to contain JB Emergency Developers
-        sphinxConfig.projectName = "nana-omnichain-deployers";
+        sphinxConfig.projectName = "nana-omnichain-deployers-testnet";
         sphinxConfig.mainnets = ["ethereum", "optimism", "base", "arbitrum"];
         sphinxConfig.testnets = ["ethereum_sepolia", "optimism_sepolia", "base_sepolia", "arbitrum_sepolia"];
     }
