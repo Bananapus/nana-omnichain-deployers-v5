@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-
-
 import {IJB721TiersHook} from "@bananapus/721-hook/src/interfaces/IJB721TiersHook.sol";
 import {JBDeploy721TiersHookConfig} from "@bananapus/721-hook/src/structs/JBDeploy721TiersHookConfig.sol";
 import {JBLaunchProjectConfig} from "@bananapus/721-hook/src/structs/JBLaunchProjectConfig.sol";
@@ -12,10 +10,10 @@ import {IJBRulesetDataHook} from "@bananapus/core/src/interfaces/IJBRulesetDataH
 import {JBRulesetConfig} from "@bananapus/core/src/structs/JBRulesetConfig.sol";
 import {JBTerminalConfig} from "@bananapus/core/src/structs/JBTerminalConfig.sol";
 import {REVSuckerDeploymentConfig} from "@rev-net/core/src/structs/REVSuckerDeploymentConfig.sol";
-
+import {JBDeployerHookConfig} from "../structs/JBDeployerHookConfig.sol";
 
 interface IJBOmnichainDeployer {
-    function dataHookOf(uint256 projectId, uint256 rulesetId) external view returns (IJBRulesetDataHook);
+    // TODO: Add `dataHookOf` mapping back to this interface.
     function launchProjectFor(
         address owner,
         string calldata projectUri,
@@ -64,3 +62,4 @@ interface IJBOmnichainDeployer {
         external
         returns (uint256 rulesetId, IJB721TiersHook hook);
 }
+
