@@ -23,6 +23,7 @@ import {JBPayHookSpecification} from "@bananapus/core/src/structs/JBPayHookSpeci
 import {JBPermissionsData} from "@bananapus/core/src/structs/JBPermissionsData.sol";
 
 import {JBRulesetConfig} from "@bananapus/core/src/structs/JBRulesetConfig.sol";
+import {JBRuleset} from "@bananapus/core/src/structs/JBRuleset.sol";
 import {JBTerminalConfig} from "@bananapus/core/src/structs/JBTerminalConfig.sol";
 import {IJBSuckerRegistry} from "@bananapus/suckers/src/interfaces/IJBSuckerRegistry.sol";
 import {JBPermissionIds} from "@bananapus/permission-ids/src/JBPermissionIds.sol";
@@ -31,7 +32,13 @@ import {REVSuckerDeploymentConfig} from "@rev-net/core/src/structs/REVSuckerDepl
 import {IJBOmnichainDeployer} from "./interfaces/IJBOmnichainDeployer.sol";
 
 /// @notice `JBDeployer` deploys, manages, and operates Juicebox projects with suckers.
-contract JBOmnichainDeployer is ERC2771Context, JBPermissioned, IJBOmnichainDeployer, IJBRulesetDataHook, IERC721Receiver {
+contract JBOmnichainDeployer is
+    ERC2771Context,
+    JBPermissioned,
+    IJBOmnichainDeployer,
+    IJBRulesetDataHook,
+    IERC721Receiver
+{
     //*********************************************************************//
     // --------------- public immutable stored properties ---------------- //
     //*********************************************************************//
@@ -109,7 +116,17 @@ contract JBOmnichainDeployer is ERC2771Context, JBPermissioned, IJBOmnichainDepl
         override
         returns (uint256 weight, JBPayHookSpecification[] memory hookSpecifications)
     {
-        return dataHookOf[context.projectId][context.rulesetId].beforePayRecordedWith(context);
+        // Fetch the datahook for the ruleset.
+        (JBRuleset memory ruleset,) = CONTROLLER.getRulesetOf(context.projectId, context.rulesetId);
+        IJBRulesetDataHook datahook = dataHookOf[context.projectId][ruleset.basedOnId];
+
+        // If no data hook is set, return the original values.
+        if (address(datahook) == address(0)) {
+            return (ruleset.weight, hookSpecifications);
+        }
+
+        // Otherwise, forward the call to the datahook.
+        return datahook.beforePayRecordedWith(context);
     }
 
     /// @notice Allow cash outs from suckers without a tax.
@@ -136,9 +153,26 @@ contract JBOmnichainDeployer is ERC2771Context, JBPermissioned, IJBOmnichainDepl
             return (0, context.cashOutCount, context.totalSupply, hookSpecifications);
         }
 
-        // Forward the call to the original data hook.
-        (cashOutTaxRate, cashOutCount, totalSupply, hookSpecifications) =
-            dataHookOf[context.projectId][context.rulesetId].beforePayRecordedWith(context);
+        // Fetch the datahook for the ruleset.
+        (JBRuleset memory ruleset,) = CONTROLLER.getRulesetOf(context.projectId, context.rulesetId);
+        IJBRulesetDataHook datahook = dataHookOf[context.projectId][ruleset.basedOnId];
+
+        // If no data hook is set, return the original values.
+        if (address(datahook) == address(0)) {
+            return (ruleset.weight, context.cashOutCount, context.totalSupply, hookSpecifications);
+        }
+
+        // If the ruleset has a data hook, forward the call to the datahook.
+        return datahook.beforeCashOutRecordedWith(context);
+    }
+
+    /// @notice A flag indicating whether an address has permission to mint a project's tokens on-demand.
+    /// @dev A project's data hook can allow any address to mint its tokens.
+    /// @param projectId The ID of the project whose token can be minted.
+    /// @param addr The address to check the token minting permission of.
+    /// @return flag A flag indicating whether the address has permission to mint the project's tokens on-demand.
+    function hasMintPermissionFor(uint256 projectId, address addr) external view returns (bool flag) {
+        return SUCKER_REGISTRY.isSuckerOf(projectId, addr);
     }
 
     //*********************************************************************//
@@ -149,8 +183,8 @@ contract JBOmnichainDeployer is ERC2771Context, JBPermissioned, IJBOmnichainDepl
     /// @dev See `IERC165.supportsInterface`.
     /// @return A flag indicating if the provided interface ID is supported.
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IJBOmnichainDeployer).interfaceId || interfaceId == type(IJBRulesetDataHook).interfaceId
-            || interfaceId == type(IERC721Receiver).interfaceId;
+        return interfaceId == type(IJBOmnichainDeployer).interfaceId
+            || interfaceId == type(IJBRulesetDataHook).interfaceId || interfaceId == type(IERC721Receiver).interfaceId;
     }
 
     //*********************************************************************//
