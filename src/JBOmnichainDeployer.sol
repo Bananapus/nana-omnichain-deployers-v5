@@ -36,7 +36,7 @@ import {IJBOmnichainDeployer} from "./interfaces/IJBOmnichainDeployer.sol";
 import {JBDeployerHookConfig} from "./structs/JBDeployerHookConfig.sol";
 import {JBOwnable} from "@bananapus/ownable/src/JBOwnable.sol";
 
-/// @notice `JBDeployer` deploys, manages, and operates Juicebox projects with suckers.
+/// @notice Deploys, manages, and operates Juicebox projects with suckers.
 contract JBOmnichainDeployer is
     ERC2771Context,
     JBPermissioned,
