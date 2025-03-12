@@ -355,7 +355,18 @@ contract JBOmnichainDeployer is
         external
         returns (uint256)
     {
-        // TODO: Permissions.
+        // Enforce permissions.
+        _requirePermissionFrom({
+            account: PROJECTS.ownerOf(projectId),
+            projectId: projectId,
+            permissionId: JBPermissionIds.QUEUE_RULESETS
+        });
+
+        _requirePermissionFrom({
+            account: PROJECTS.ownerOf(projectId),
+            projectId: projectId,
+            permissionId: JBPermissionIds.SET_TERMINALS
+        });
 
         return CONTROLLER.launchRulesetsFor({
             projectId: projectId,
@@ -384,7 +395,18 @@ contract JBOmnichainDeployer is
         external
         returns (uint256 rulesetId, IJB721TiersHook hook)
     {
-        // TODO: Permissions.
+        // Enforce permissions.
+        _requirePermissionFrom({
+            account: PROJECTS.ownerOf(projectId),
+            projectId: projectId,
+            permissionId: JBPermissionIds.QUEUE_RULESETS
+        });
+
+        _requirePermissionFrom({
+            account: PROJECTS.ownerOf(projectId),
+            projectId: projectId,
+            permissionId: JBPermissionIds.SET_TERMINALS
+        });
 
         // Deploy the hook.
         hook = HOOK_DEPLOYER.deployHookFor({
@@ -425,6 +447,13 @@ contract JBOmnichainDeployer is
         external
         returns (uint256)
     {
+        // Enforce permissions.
+        _requirePermissionFrom({
+            account: PROJECTS.ownerOf(projectId),
+            projectId: projectId,
+            permissionId: JBPermissionIds.QUEUE_RULESETS
+        });
+
         return CONTROLLER.queueRulesetsOf({
             projectId: projectId,
             rulesetConfigurations: _setup({projectId: projectId, rulesetConfigurations: rulesetConfigurations}),
@@ -450,7 +479,12 @@ contract JBOmnichainDeployer is
         external
         returns (uint256 rulesetId, IJB721TiersHook hook)
     {
-        // TODO: Permissions.
+        // Enforce permissions.
+        _requirePermissionFrom({
+            account: PROJECTS.ownerOf(projectId),
+            projectId: projectId,
+            permissionId: JBPermissionIds.QUEUE_RULESETS
+        });
 
         // Deploy the hook.
         hook = HOOK_DEPLOYER.deployHookFor({
@@ -524,29 +558,29 @@ contract JBOmnichainDeployer is
         rulesetConfigurations = new JBRulesetConfig[](launchProjectConfig.length);
 
         for (uint256 i; i < launchProjectConfig.length; i++) {
-            JBPayDataHookRulesetMetadata calldata _721Metadata = launchProjectConfig[i].metadata;
+            JBPayDataHookRulesetMetadata calldata hookMetadata = launchProjectConfig[i].metadata;
             JBRulesetMetadata memory metadata = JBRulesetMetadata({
                 // These fields are enforced as this is a 721 ruleset.
                 useDataHookForPay: true,
                 allowSetCustomToken: false,
                 dataHook: address(dataHook),
                 // These fields are present in the 721 metadata.
-                reservedPercent: _721Metadata.reservedPercent,
-                cashOutTaxRate: _721Metadata.cashOutTaxRate,
-                baseCurrency: _721Metadata.baseCurrency,
-                pausePay: _721Metadata.pausePay,
-                pauseCreditTransfers: _721Metadata.pauseCreditTransfers,
-                allowOwnerMinting: _721Metadata.allowOwnerMinting,
-                allowTerminalMigration: _721Metadata.allowTerminalMigration,
-                allowSetController: _721Metadata.allowSetController,
-                allowSetTerminals: _721Metadata.allowSetTerminals,
-                allowAddAccountingContext: _721Metadata.allowAddAccountingContext,
-                allowAddPriceFeed: _721Metadata.allowAddPriceFeed,
-                ownerMustSendPayouts: _721Metadata.ownerMustSendPayouts,
-                holdFees: _721Metadata.holdFees,
-                useTotalSurplusForCashOuts: _721Metadata.useTotalSurplusForCashOuts,
-                useDataHookForCashOut: _721Metadata.useDataHookForCashOut,
-                metadata: _721Metadata.metadata
+                reservedPercent: hookMetadata.reservedPercent,
+                cashOutTaxRate: hookMetadata.cashOutTaxRate,
+                baseCurrency: hookMetadata.baseCurrency,
+                pausePay: hookMetadata.pausePay,
+                pauseCreditTransfers: hookMetadata.pauseCreditTransfers,
+                allowOwnerMinting: hookMetadata.allowOwnerMinting,
+                allowTerminalMigration: hookMetadata.allowTerminalMigration,
+                allowSetController: hookMetadata.allowSetController,
+                allowSetTerminals: hookMetadata.allowSetTerminals,
+                allowAddAccountingContext: hookMetadata.allowAddAccountingContext,
+                allowAddPriceFeed: hookMetadata.allowAddPriceFeed,
+                ownerMustSendPayouts: hookMetadata.ownerMustSendPayouts,
+                holdFees: hookMetadata.holdFees,
+                useTotalSurplusForCashOuts: hookMetadata.useTotalSurplusForCashOuts,
+                useDataHookForCashOut: hookMetadata.useDataHookForCashOut,
+                metadata: hookMetadata.metadata
             });
 
             rulesetConfigurations[i] = JBRulesetConfig({
