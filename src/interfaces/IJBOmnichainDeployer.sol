@@ -62,4 +62,3 @@ interface IJBOmnichainDeployer {
         external
         returns (uint256 rulesetId, IJB721TiersHook hook);
 }
-

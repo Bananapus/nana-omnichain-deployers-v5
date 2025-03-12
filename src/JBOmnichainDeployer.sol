@@ -8,10 +8,8 @@ import {IJB721TiersHook} from "@bananapus/721-hook/src/interfaces/IJB721TiersHoo
 import {IJB721TiersHookDeployer} from "@bananapus/721-hook/src/interfaces/IJB721TiersHookProjectDeployer.sol";
 import {JBDeploy721TiersHookConfig} from "@bananapus/721-hook/src/structs/JBDeploy721TiersHookConfig.sol";
 import {JBLaunchProjectConfig} from "@bananapus/721-hook/src/structs/JBLaunchProjectConfig.sol";
-import {
-    JBLaunchRulesetsConfig,
-    JBPayDataHookRulesetConfig
-} from "@bananapus/721-hook/src/structs/JBLaunchRulesetsConfig.sol";
+import {JBLaunchRulesetsConfig} from "@bananapus/721-hook/src/structs/JBLaunchRulesetsConfig.sol";
+import {JBPayDataHookRulesetConfig} from "@bananapus/721-hook/src/structs/JBPayDataHookRulesetConfig.sol";
 import {JBQueueRulesetsConfig} from "@bananapus/721-hook/src/structs/JBQueueRulesetsConfig.sol";
 import {JBPermissioned} from "@bananapus/core/src/abstract/JBPermissioned.sol";
 import {IJBController} from "@bananapus/core/src/interfaces/IJBController.sol";
@@ -26,7 +24,8 @@ import {JBPayHookSpecification} from "@bananapus/core/src/structs/JBPayHookSpeci
 
 import {JBPermissionsData} from "@bananapus/core/src/structs/JBPermissionsData.sol";
 import {JBPayDataHookRulesetMetadata} from "@bananapus/721-hook/src/structs/JBPayDataHookRulesetMetadata.sol";
-import {JBRulesetConfig, JBRulesetMetadata} from "@bananapus/core/src/structs/JBRulesetConfig.sol";
+import {JBRulesetConfig} from "@bananapus/core/src/structs/JBRulesetConfig.sol";
+import {JBRulesetMetadata} from "@bananapus/core/src/structs/JBRulesetMetadata.sol";
 import {JBRuleset} from "@bananapus/core/src/structs/JBRuleset.sol";
 import {JBTerminalConfig} from "@bananapus/core/src/structs/JBTerminalConfig.sol";
 import {IJBSuckerRegistry} from "@bananapus/suckers/src/interfaces/IJBSuckerRegistry.sol";
