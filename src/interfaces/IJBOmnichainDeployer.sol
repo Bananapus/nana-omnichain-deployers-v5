@@ -13,7 +13,14 @@ import {REVSuckerDeploymentConfig} from "@rev-net/core/src/structs/REVSuckerDepl
 import {JBDeployerHookConfig} from "../structs/JBDeployerHookConfig.sol";
 
 interface IJBOmnichainDeployer {
-    // TODO: Add `dataHookOf` mapping back to this interface.
+    function dataHookOf(
+        uint256 projectId,
+        uint256 rulesetId
+    )
+        external
+        view
+        returns (bool useDataHookForPay, bool useDataHookForCashout, IJBRulesetDataHook dataHook);
+
     function launchProjectFor(
         address owner,
         string calldata projectUri,
@@ -62,4 +69,3 @@ interface IJBOmnichainDeployer {
         external
         returns (uint256 rulesetId, IJB721TiersHook hook);
 }
-
