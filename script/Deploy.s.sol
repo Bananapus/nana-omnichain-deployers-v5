@@ -24,7 +24,7 @@ contract Deploy is Script, Sphinx {
 
     function configureSphinx() public override {
         // TODO: Update to contain JB Emergency Developers
-        sphinxConfig.projectName = "nana-omnichain-deployers-testnet";
+        sphinxConfig.projectName = "nana-omnichain-deployers";
         sphinxConfig.mainnets = ["ethereum", "optimism", "base", "arbitrum"];
         sphinxConfig.testnets = ["ethereum_sepolia", "optimism_sepolia", "base_sepolia", "arbitrum_sepolia"];
     }
@@ -54,11 +54,11 @@ contract Deploy is Script, Sphinx {
             !_isDeployed(
                 NANA_OMNICHAIN_DEPLOYER_SALT,
                 type(JBOmnichainDeployer).creationCode,
-                abi.encode(core.controller, suckers.registry, hook.project_deployer, core.trustedForwarder)
+                abi.encode(core.controller, suckers.registry, hook.hook_deployer, core.trustedForwarder)
             )
         ) {
             new JBOmnichainDeployer{salt: NANA_OMNICHAIN_DEPLOYER_SALT}(
-                core.controller, suckers.registry, hook.project_deployer, core.trustedForwarder
+                core.controller, suckers.registry, hook.hook_deployer, core.trustedForwarder
             );
         }
     }
