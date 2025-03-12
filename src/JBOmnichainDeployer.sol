@@ -176,7 +176,22 @@ contract JBOmnichainDeployer is
     /// @param addr The address to check the token minting permission of.
     /// @return flag A flag indicating whether the address has permission to mint the project's tokens on-demand.
     function hasMintPermissionFor(uint256 projectId, address addr) external view returns (bool flag) {
-        return SUCKER_REGISTRY.isSuckerOf(projectId, addr);
+        // If the address is a sucker for this project.
+        if (SUCKER_REGISTRY.isSuckerOf(projectId, addr)) {
+            return true;
+        }
+
+        // Get the current ruleset of the project.
+        (JBRuleset memory ruleset,) = CONTROLLER.currentRulesetOf(projectId);
+        JBDeployerHookConfig memory hook = dataHookOf[projectId][ruleset.id];
+
+        // If no data hook is set, return false.
+        if (address(hook.dataHook) == address(0)) {
+            return false;
+        }
+
+        // Forward the call to the datahook.
+        return hook.dataHook.hasMintPermissionFor(projectId, addr);
     }
 
     //*********************************************************************//
