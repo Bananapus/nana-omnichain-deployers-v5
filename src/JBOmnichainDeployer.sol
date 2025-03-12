@@ -123,12 +123,11 @@ contract JBOmnichainDeployer is
         returns (uint256 weight, JBPayHookSpecification[] memory hookSpecifications)
     {
         // Fetch the datahook for the ruleset.
-        (JBRuleset memory ruleset,) = CONTROLLER.getRulesetOf(context.projectId, context.rulesetId);
-        JBDeployerHookConfig memory hook = dataHookOf[context.projectId][ruleset.basedOnId];
+        JBDeployerHookConfig memory hook = dataHookOf[context.projectId][context.rulesetId];
 
         // If no data hook is set, return the original values.
         if (address(hook.dataHook) == address(0) || !hook.useDataHookForPay) {
-            return (ruleset.weight, hookSpecifications);
+            return (context.weight, hookSpecifications);
         }
 
         // Otherwise, forward the call to the datahook.
@@ -160,12 +159,11 @@ contract JBOmnichainDeployer is
         }
 
         // Fetch the datahook for the ruleset.
-        (JBRuleset memory ruleset,) = CONTROLLER.getRulesetOf(context.projectId, context.rulesetId);
-        JBDeployerHookConfig memory hook = dataHookOf[context.projectId][ruleset.basedOnId];
+        JBDeployerHookConfig memory hook = dataHookOf[context.projectId][context.rulesetId];
 
         // If no data hook is set, or the data hook is not used for cash outs, return the original values.
         if (address(hook.dataHook) == address(0) || !hook.useDataHookForCashOut) {
-            return (ruleset.weight, context.cashOutCount, context.totalSupply, hookSpecifications);
+            return (context.cashOutTaxRate, context.cashOutCount, context.totalSupply, hookSpecifications);
         }
 
         // If the ruleset has a data hook, forward the call to the datahook.
