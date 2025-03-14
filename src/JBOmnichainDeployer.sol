@@ -44,7 +44,6 @@ contract JBOmnichainDeployer is
     IJBRulesetDataHook,
     IERC721Receiver
 {
-
     //*********************************************************************//
     // --------------- public immutable stored properties ---------------- //
     //*********************************************************************//
