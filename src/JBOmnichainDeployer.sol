@@ -44,6 +44,7 @@ contract JBOmnichainDeployer is
     IJBRulesetDataHook,
     IERC721Receiver
 {
+
     //*********************************************************************//
     // --------------- public immutable stored properties ---------------- //
     //*********************************************************************//
@@ -67,7 +68,7 @@ contract JBOmnichainDeployer is
     /// @notice Each project's data hook provided on deployment.
     /// @custom:param projectId The ID of the project to get the data hook for.
     /// @custom:param rulesetId The ID of the ruleset to get the data hook for.
-    mapping(uint256 projectId => mapping(uint256 rulesetId => JBDeployerHookConfig)) public dataHookOf;
+    mapping(uint256 projectId => mapping(uint256 rulesetId => JBDeployerHookConfig)) public override dataHookOf;
 
     //*********************************************************************//
     // -------------------------- constructor ---------------------------- //
@@ -561,6 +562,10 @@ contract JBOmnichainDeployer is
         return rulesetConfigurations;
     }
 
+    /// @notice Converts a 721 ruleset configuration to a regular ruleset configuration.
+    /// @param launchProjectConfig The 721 ruleset configuration to convert.
+    /// @param dataHook The data hook to use for the ruleset.
+    /// @return rulesetConfigurations The converted ruleset configuration.
     function _from721Config(
         JBPayDataHookRulesetConfig[] calldata launchProjectConfig,
         IJB721TiersHook dataHook
