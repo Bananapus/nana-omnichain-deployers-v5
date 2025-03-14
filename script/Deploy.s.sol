@@ -54,11 +54,11 @@ contract Deploy is Script, Sphinx {
             !_isDeployed(
                 NANA_OMNICHAIN_DEPLOYER_SALT,
                 type(JBOmnichainDeployer).creationCode,
-                abi.encode(core.controller, suckers.registry, hook.project_deployer, core.trustedForwarder)
+                abi.encode(core.controller, suckers.registry, hook.hook_deployer, core.trustedForwarder)
             )
         ) {
             new JBOmnichainDeployer{salt: NANA_OMNICHAIN_DEPLOYER_SALT}(
-                core.controller, suckers.registry, hook.project_deployer, core.trustedForwarder
+                core.controller, suckers.registry, hook.hook_deployer, core.trustedForwarder
             );
         }
     }
