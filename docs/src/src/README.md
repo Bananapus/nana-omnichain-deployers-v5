@@ -1,4 +1,6 @@
 
 
 # Contents
-- [JBDeployer](JBOmnichainDeployer.sol/contract.JBDeployer.md)
+- [interfaces](/src/interfaces)
+- [structs](/src/structs)
+- [JBOmnichainDeployer](JBOmnichainDeployer.sol/contract.JBOmnichainDeployer.md)

@@ -1,4 +1,8 @@
 # Summary
 - [Home](README.md)
 # src
-  - [JBDeployer](src/JBOmnichainDeployer.sol/contract.JBDeployer.md)
+  - [❱ interfaces](src/interfaces/README.md)
+    - [IJBOmnichainDeployer](src/interfaces/IJBOmnichainDeployer.sol/interface.IJBOmnichainDeployer.md)
+  - [❱ structs](src/structs/README.md)
+    - [JBDeployerHookConfig](src/structs/JBDeployerHookConfig.sol/struct.JBDeployerHookConfig.md)
+  - [JBOmnichainDeployer](src/JBOmnichainDeployer.sol/contract.JBOmnichainDeployer.md)
