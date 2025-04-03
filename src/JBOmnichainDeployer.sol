@@ -321,9 +321,6 @@ contract JBOmnichainDeployer is
             salt: salt == bytes32(0) ? bytes32(0) : keccak256(abi.encode(_msgSender(), salt))
         });
 
-        // Transfer the hook's ownership to the project.
-        JBOwnable(address(hook)).transferOwnershipToProject(projectId);
-
         // Convert the 721 ruleset configurations to regular ruleset configurations.
         JBRulesetConfig[] memory rulesetConfigurations = _from721Config(launchProjectConfig.rulesetConfigurations, hook);
 
@@ -338,6 +335,9 @@ contract JBOmnichainDeployer is
                     memo: launchProjectConfig.memo
                 })
         );
+
+        // Transfer the hook's ownership to the project.
+        JBOwnable(address(hook)).transferOwnershipToProject(projectId);
 
         // Deploy the suckers (if applicable).
         if (suckerDeploymentConfiguration.salt != bytes32(0)) {
