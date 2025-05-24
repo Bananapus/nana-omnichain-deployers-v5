@@ -9,6 +9,7 @@ import {Context} from "@openzeppelin/contracts/utils/Context.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {mulDiv} from "@prb/math/src/Common.sol";
 
+import {JBPermissionsData} from "@bananapus/core/src/structs/JBPermissionsData.sol";
 import {IJBSuckerRegistry} from "@bananapus/suckers/src/interfaces/IJBSuckerRegistry.sol";
 import {JBPermissioned} from "@bananapus/core/src/abstract/JBPermissioned.sol";
 import {JBApprovalStatus} from "@bananapus/core/src/enums/JBApprovalStatus.sol";
@@ -41,6 +42,7 @@ import {JBSplit} from "@bananapus/core/src/structs/JBSplit.sol";
 import {JBSplitGroup} from "@bananapus/core/src/structs/JBSplitGroup.sol";
 import {JBSplitHookContext} from "@bananapus/core/src/structs/JBSplitHookContext.sol";
 import {JBTerminalConfig} from "@bananapus/core/src/structs/JBTerminalConfig.sol";
+import {REVSuckerDeploymentConfig} from "@rev-net/core/src/structs/REVSuckerDeploymentConfig.sol";
 
 /// @notice `JBOmniController` coordinates rulesets and project tokens, for Omnichain enabled projects, and is the entry
 /// point for most operations related to rulesets and project tokens.
@@ -145,6 +147,19 @@ contract JBOmniController is JBPermissioned, ERC2771Context, IJBController, IJBM
         SPLITS = splits;
         SUCKER_REGISTRY = suckerRegistry;
         TOKENS = tokens;
+
+        // Give the sucker registry permission to map tokens for all projects, as long as they are *owned* by this
+        // controller. (which is only during creation of the project).
+        uint8[] memory permissionIds = new uint8[](1);
+        permissionIds[0] = JBPermissionIds.MAP_SUCKER_TOKEN;
+
+        // Give the operator the permission.
+        // Set up the permission data.
+        JBPermissionsData memory permissionData =
+            JBPermissionsData({operator: address(SUCKER_REGISTRY), projectId: 0, permissionIds: permissionIds});
+
+        // Set the permissions.
+        PERMISSIONS.setPermissionsFor({account: address(this), permissionsData: permissionData});
     }
 
     //*********************************************************************//
@@ -474,6 +489,33 @@ contract JBOmniController is JBPermissioned, ERC2771Context, IJBController, IJBM
         return TOKENS.deployERC20For({projectId: projectId, name: name, symbol: symbol, salt: salt});
     }
 
+    /// @notice Deploy new suckers for an existing project.
+    /// @dev Only the juicebox's owner can deploy new suckers.
+    /// @param projectId The ID of the project to deploy suckers for.
+    /// @param suckerDeploymentConfiguration The suckers to set up for the project.
+    function deploySuckersFor(
+        uint256 projectId,
+        REVSuckerDeploymentConfig calldata suckerDeploymentConfiguration
+    )
+        external
+        returns (address[] memory suckers)
+    {
+        // Enforce permissions.
+        _requirePermissionFrom({
+            account: PROJECTS.ownerOf(projectId),
+            projectId: projectId,
+            permissionId: JBPermissionIds.DEPLOY_SUCKERS
+        });
+
+        // Deploy the suckers.
+        // slither-disable-next-line unused-return
+        suckers = SUCKER_REGISTRY.deploySuckersFor({
+            projectId: projectId,
+            salt: keccak256(abi.encode(suckerDeploymentConfiguration.salt, _msgSender())),
+            configurations: suckerDeploymentConfiguration.deployerConfigurations
+        });
+    }
+
     /// @notice When a project receives reserved tokens, if it has a terminal for the token, this is used to pay the
     /// terminal.
     /// @dev Can only be called by this controller.
@@ -532,7 +574,7 @@ contract JBOmniController is JBPermissioned, ERC2771Context, IJBController, IJBM
         JBTerminalConfig[] calldata terminalConfigurations,
         string calldata memo
     )
-        external
+        public
         override
         returns (uint256 projectId)
     {
@@ -562,6 +604,54 @@ contract JBOmniController is JBPermissioned, ERC2771Context, IJBController, IJBM
             memo: memo,
             caller: _msgSender()
         });
+    }
+
+    /// @notice Creates a project with suckers.
+    /// @dev This will mint the project's ERC-721 to the `owner`'s address, queue the specified rulesets, and set up the
+    /// specified splits and terminals. Each operation within this transaction can be done in sequence separately.
+    /// @dev Anyone can deploy a project to any `owner`'s address.
+    /// @param owner The project's owner. The project ERC-721 will be minted to this address.
+    /// @param projectUri The project's metadata URI. This is typically an IPFS hash, optionally with the `ipfs://`
+    /// prefix. This can be updated by the project's owner.
+    /// @param rulesetConfigurations The rulesets to queue.
+    /// @param terminalConfigurations The terminals to set up for the project.
+    /// @param memo A memo to pass along to the emitted event.
+    /// @param suckerDeploymentConfiguration The suckers to set up for the project. Suckers facilitate cross-chain
+    /// token transfers between peer projects on different networks.
+    /// @return projectId The project's ID.
+    function launchProjectFor(
+        address owner,
+        string calldata projectUri,
+        JBRulesetConfig[] calldata rulesetConfigurations,
+        JBTerminalConfig[] calldata terminalConfigurations,
+        string calldata memo,
+        REVSuckerDeploymentConfig calldata suckerDeploymentConfiguration
+    )
+        external
+        returns (uint256 projectId, address[] memory suckers)
+    {
+        // Create the project with this controller as the owner.
+        projectId = launchProjectFor({
+            owner: address(this),
+            projectUri: projectUri,
+            rulesetConfigurations: rulesetConfigurations,
+            terminalConfigurations: terminalConfigurations,
+            memo: memo
+        });
+
+        // Deploy the suckers (if applicable).
+        if (suckerDeploymentConfiguration.salt != bytes32(0)) {
+            // Deploy the suckers.
+            // slither-disable-next-line unused-return
+            suckers = SUCKER_REGISTRY.deploySuckersFor({
+                projectId: projectId,
+                salt: keccak256(abi.encode(suckerDeploymentConfiguration.salt, _msgSender())),
+                configurations: suckerDeploymentConfiguration.deployerConfigurations
+            });
+        }
+
+        // Transfer ownership of the project to the owner.
+        PROJECTS.transferFrom(address(this), owner, projectId);
     }
 
     /// @notice Queue a project's initial rulesets and set up terminals for it. Projects which already have rulesets
