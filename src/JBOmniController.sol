@@ -44,9 +44,11 @@ import {JBSplitHookContext} from "@bananapus/core/src/structs/JBSplitHookContext
 import {JBTerminalConfig} from "@bananapus/core/src/structs/JBTerminalConfig.sol";
 import {REVSuckerDeploymentConfig} from "@rev-net/core/src/structs/REVSuckerDeploymentConfig.sol";
 
+import {IJBOmnichainDeployer} from "./interfaces/IJBOmnichainDeployer.sol";
+
 /// @notice `JBOmniController` coordinates rulesets and project tokens, for Omnichain enabled projects, and is the entry
 /// point for most operations related to rulesets and project tokens.
-contract JBOmniController is JBPermissioned, ERC2771Context, IJBController, IJBMigratable {
+contract JBOmniController is JBPermissioned, ERC2771Context, IJBOmnichainController, IJBMigratable {
     // A library that parses packed ruleset metadata into a friendlier format.
     using JBRulesetMetadataResolver for JBRuleset;
 
@@ -296,7 +298,7 @@ contract JBOmniController is JBPermissioned, ERC2771Context, IJBController, IJBM
     /// @param interfaceId The ID of the interface to check for adherence to.
     /// @return A flag indicating if the provided interface ID is supported.
     function supportsInterface(bytes4 interfaceId) public pure override returns (bool) {
-        return interfaceId == type(IJBController).interfaceId || interfaceId == type(IJBProjectUriRegistry).interfaceId
+        return interfaceId == type(IJBController).interfaceId || interfaceId == type(IJBOmnichainController).interfaceId ||interfaceId == type(IJBProjectUriRegistry).interfaceId
             || interfaceId == type(IJBDirectoryAccessControl).interfaceId || interfaceId == type(IJBMigratable).interfaceId
             || interfaceId == type(IJBPermissioned).interfaceId || interfaceId == type(IERC165).interfaceId;
     }
@@ -484,6 +486,9 @@ contract JBOmniController is JBPermissioned, ERC2771Context, IJBController, IJBM
             permissionId: JBPermissionIds.DEPLOY_ERC20
         });
 
+        // Emit the event logging the original salt.
+        emit DeployERC20({projectId: projectId, name: name, symbol: symbol, salt: salt, caller: _msgSender()});
+
         if (salt != bytes32(0)) salt = keccak256(abi.encodePacked(_msgSender(), salt));
 
         return TOKENS.deployERC20For({projectId: projectId, name: name, symbol: symbol, salt: salt});
@@ -628,6 +633,7 @@ contract JBOmniController is JBPermissioned, ERC2771Context, IJBController, IJBM
         REVSuckerDeploymentConfig calldata suckerDeploymentConfiguration
     )
         external
+        override
         returns (uint256 projectId, address[] memory suckers)
     {
         // Create the project with this controller as the owner.
