@@ -10,7 +10,6 @@ import {REVSuckerDeploymentConfig} from "@rev-net/core/src/structs/REVSuckerDepl
 /// @title IJBOmniController
 /// @notice Interface for the JBOmniController contract that handles omnichain project deployment and management.
 interface IJBOmniController is IJBController {
-
     event DeployERC20(uint256 indexed projectId, string name, string symbol, bytes32 salt, address caller);
 
     function launchProjectFor(
@@ -20,5 +19,7 @@ interface IJBOmniController is IJBController {
         JBTerminalConfig[] calldata terminalConfigurations,
         string calldata memo,
         REVSuckerDeploymentConfig calldata suckerDeploymentConfiguration
-    ) external returns (uint256 projectId, address[] memory suckers);
-} 
+    )
+        external
+        returns (uint256 projectId, address[] memory suckers);
+}

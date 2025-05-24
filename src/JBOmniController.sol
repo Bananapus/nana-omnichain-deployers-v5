@@ -298,7 +298,8 @@ contract JBOmniController is JBPermissioned, ERC2771Context, IJBOmniController, 
     /// @param interfaceId The ID of the interface to check for adherence to.
     /// @return A flag indicating if the provided interface ID is supported.
     function supportsInterface(bytes4 interfaceId) public pure override returns (bool) {
-        return interfaceId == type(IJBController).interfaceId || interfaceId == type(IJBOmniController).interfaceId ||interfaceId == type(IJBProjectUriRegistry).interfaceId
+        return interfaceId == type(IJBController).interfaceId || interfaceId == type(IJBOmniController).interfaceId
+            || interfaceId == type(IJBProjectUriRegistry).interfaceId
             || interfaceId == type(IJBDirectoryAccessControl).interfaceId || interfaceId == type(IJBMigratable).interfaceId
             || interfaceId == type(IJBPermissioned).interfaceId || interfaceId == type(IERC165).interfaceId;
     }
