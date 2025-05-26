@@ -22,6 +22,13 @@ interface IJBOmnichainDeployer4_1 {
         view
         returns (bool useDataHookForPay, bool useDataHookForCashout, IJBRulesetDataHook4_1 dataHook);
 
+    function deploySuckersFor(
+        uint256 projectId,
+        REVSuckerDeploymentConfig calldata suckerDeploymentConfiguration
+    )
+        external
+        returns (address[] memory suckers);
+
     function launchProjectFor(
         address owner,
         string calldata projectUri,

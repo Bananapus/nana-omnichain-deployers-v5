@@ -187,6 +187,7 @@ contract JBOmnichainDeployer4_1 is
     )
         external
         view
+        override
         returns (bool useDataHookForPay, bool useDataHookForCashout, IJBRulesetDataHook4_1 dataHook)
     {
         JBDeployerHookConfig4_1 memory hook = _dataHookOf[projectId][rulesetId];
@@ -206,6 +207,7 @@ contract JBOmnichainDeployer4_1 is
     )
         external
         view
+        override
         returns (bool flag)
     {
         // If the address is a sucker for this project.
@@ -250,6 +252,7 @@ contract JBOmnichainDeployer4_1 is
         REVSuckerDeploymentConfig calldata suckerDeploymentConfiguration
     )
         external
+        override
         returns (address[] memory suckers)
     {
         // Enforce permissions.
