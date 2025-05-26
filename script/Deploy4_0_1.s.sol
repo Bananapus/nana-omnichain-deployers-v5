@@ -8,7 +8,7 @@ import "@bananapus/core/script/helpers/CoreDeploymentLib.sol";
 import "@bananapus/suckers/script/helpers/SuckerDeploymentLib.sol";
 import "@bananapus/721-hook/script/helpers/Hook721DeploymentLib.sol";
 
-import "src/JBOmnichainDeployer4_0_1.sol";
+import "src/JBOmnichainDeployer4_1.sol";
 
 contract Deploy is Script, Sphinx {
     bytes32 constant NANA_OMNICHAIN_DEPLOYER_SALT = "JBOmnichainDeployer";
@@ -52,11 +52,11 @@ contract Deploy is Script, Sphinx {
         if (
             !_isDeployed(
                 NANA_OMNICHAIN_DEPLOYER_SALT,
-                type(JBOmnichainDeployer4_0_1).creationCode,
+                type(JBOmnichainDeployer4_1).creationCode,
                 abi.encode(suckers.registry, hook.hook_deployer, core.trustedForwarder)
             )
         ) {
-            new JBOmnichainDeployer4_0_1{salt: NANA_OMNICHAIN_DEPLOYER_SALT}(
+            new JBOmnichainDeployer4_1{salt: NANA_OMNICHAIN_DEPLOYER_SALT}(
                 suckers.registry, hook.hook_deployer, core.trustedForwarder
             );
         }
