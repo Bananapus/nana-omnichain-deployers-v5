@@ -58,7 +58,7 @@ contract Deploy is Script, Sphinx {
             )
         ) {
             new JBOmnichainDeployer{salt: NANA_OMNICHAIN_DEPLOYER_SALT}(
-                core.controller, suckers.registry, hook.hook_deployer, core.trustedForwarder
+                suckers.registry, hook.hook_deployer, core.permissions, core.projects, core.trustedForwarder
             );
         }
     }

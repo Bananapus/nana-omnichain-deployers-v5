@@ -18,8 +18,8 @@
         "@bananapus/721-hook-v5": "^0.0.01",
         "@bananapus/core-v5": "^0.0.1",
         "@bananapus/suckers-v5": "^0.0.1",
+        "@bananapus/ownable-v5": "^0.0.1",
         "@bananapus/permission-ids-v5": "^0.0.1",
-        "@rev-net/core-v5": "^0.0.1",
         "@openzeppelin/contracts": "^5.2.0"
     },
     "devDependencies": {
