@@ -125,7 +125,7 @@ contract JBOmnichainDeployer is
         external
         view
         override
-        returns (uint256 weight, JBPayHookSpecification[] memory hookSpecifications)
+        returns (uint256, JBPayHookSpecification[] memory hookSpecifications)
     {
         // Fetch the datahook for the ruleset.
         JBDeployerHookConfig memory hook = _dataHookOf[context.projectId][context.rulesetId];
@@ -136,6 +136,7 @@ contract JBOmnichainDeployer is
         }
 
         // Otherwise, forward the call to the datahook.
+        // slither-disable-next-line unused-return
         return hook.dataHook.beforePayRecordedWith(context);
     }
 
@@ -151,12 +152,7 @@ contract JBOmnichainDeployer is
         external
         view
         override
-        returns (
-            uint256 cashOutTaxRate,
-            uint256 cashOutCount,
-            uint256 totalSupply,
-            JBCashOutHookSpecification[] memory hookSpecifications
-        )
+        returns (uint256, uint256, uint256, JBCashOutHookSpecification[] memory hookSpecifications)
     {
         // If the cash out is from a sucker, return the full cash out amount without taxes or fees.
         if (SUCKER_REGISTRY.isSuckerOf(context.projectId, context.holder)) {
@@ -172,6 +168,7 @@ contract JBOmnichainDeployer is
         }
 
         // If the ruleset has a data hook, forward the call to the datahook.
+        // slither-disable-next-line unused-return
         return hook.dataHook.beforeCashOutRecordedWith(context);
     }
 
